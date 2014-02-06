@@ -9,9 +9,13 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     filesAll: [
-      'test/**/*.js',
+      '<%= filesTest %>',
+      '<%= filesSrc %>'
+    ],
+    filesSrc: [
       'lib/**/*.js',
       'Gruntfile.js',
+      'index.js'
     ],
     filesTest: [
       'test/**/*.test.js'
@@ -54,11 +58,16 @@ module.exports = function (grunt) {
     delta: {
       lint: {
         files: '<%= filesAll %>',
-        tasks: ['jshint:all']
+        tasks: ['jshint:src', 'jshint:test']
       },
       test: {
         files: '<%= filesAll %>',
-        tasks: ['jshint:all', 'env:mocha', 'mochaTest:test']
+        tasks: [
+          'jshint:src',
+          'jshint:test',
+          'env:mocha',
+          'mochaTest:test'
+        ]
       }
     },
 
@@ -66,8 +75,15 @@ module.exports = function (grunt) {
       options: {
         jshintrc: '.jshintrc'
       },
-      all: '<%= filesAll %>',
-      test: '<%= filesTest %>',
+      test: {
+        options: {
+          jshintrc: 'test/.jshintrc'
+        },
+        files: {
+          src: '<%= filesTest %>'
+        }
+      },
+      src: '<%= filesSrc %>',
       changedfile: []
     }
 
@@ -76,6 +92,11 @@ module.exports = function (grunt) {
 
   grunt.renameTask('watch', 'delta');
   grunt.registerTask('watch', ['delta:test']);
-  grunt.registerTask('test', ['jshint:all', 'env:mocha', 'mochaTest:test']);
+  grunt.registerTask('test', [
+    'jshint:src',
+    'jshint:test',
+    'env:mocha',
+    'mochaTest:test'
+  ]);
 
 };
